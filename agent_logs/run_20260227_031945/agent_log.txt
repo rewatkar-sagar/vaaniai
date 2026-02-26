@@ -1,0 +1,4 @@
+Step 1 | Action: press_key | Reason: The current screen shows a YouTube video playing, and to scroll through 10 reels, the next logical step is to use the spacebar to navigate forward, as this is a common method for advancing through content on YouTube.
+--------------------------------------------------
+Step 2 | Action: press_key | Reason: The current screen shows a YouTube Short video playing, and to continue scrolling through 10 reels, the spacebar should be pressed to advance to the next video. This is consistent with the previous action and the goal of navigating through multiple reels.
+--------------------------------------------------
