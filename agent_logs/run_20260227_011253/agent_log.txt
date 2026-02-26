@@ -1,0 +1,8 @@
+Step 1 | Action: click | Reason: The chat input field is visible and ready for typing. Clicking it will allow the user to start composing a message to Sagar.
+--------------------------------------------------
+Step 2 | Action: type_text | Reason: The chat input field is active and ready for typing. Typing 'Hello Sagar!' will compose the message to be sent to Sagar.
+--------------------------------------------------
+Step 3 | Action: click | Reason: The green send button is visible and ready to be clicked to send the composed message 'Hello Sagar!' to Sagar.
+--------------------------------------------------
+Step 4 | Action: click | Reason: The green send button is visible and ready to be clicked to send the composed message 'Hello Sagar!' to Sagar.
+--------------------------------------------------

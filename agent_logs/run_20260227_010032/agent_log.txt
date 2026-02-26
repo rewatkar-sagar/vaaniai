@@ -1,0 +1,10 @@
+Step 1 | Action: click | Reason: The chat with Sagar Tuni is visible in the chat list and needs to be selected to proceed with sending the message.
+--------------------------------------------------
+Step 2 | Action: click | Reason: The chat window for Sagar Tuni is now open, and the message input field is visible at the bottom. The next step is to type the message 'Sagar message to Sagar Tuni homework kela ka.' into the input field.
+--------------------------------------------------
+Step 3 | Action: type_text | Reason: The message input field is visible and ready for typing. The task requires sending this exact message to Sagar Tuni in the chat window.
+--------------------------------------------------
+Step 4 | Action: click | Reason: The green send button is visible at the bottom right of the chat window, indicating that the message has been typed and is ready to be sent. Clicking this button will complete the task of sending the message to Sagar Tuni.
+--------------------------------------------------
+Step 5 | Action: click | Reason: The green send button is visible at the bottom right of the chat window, indicating that the message has been typed and is ready to be sent. Clicking this button will complete the task of sending the message to Sagar Tuni.
+--------------------------------------------------

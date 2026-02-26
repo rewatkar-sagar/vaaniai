@@ -1,0 +1,4 @@
+Step 1 | Action: click | Reason: The WhatsApp icon is visible on the taskbar and needs to be clicked to open the application.
+--------------------------------------------------
+Step 2 | Action: click | Reason: The WhatsApp icon is visible on the taskbar and needs to be clicked to open the application.
+--------------------------------------------------
