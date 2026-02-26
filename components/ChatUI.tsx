@@ -1,96 +1,77 @@
 "use client";
 
-import { useState, useEffect, useRef, FormEvent } from "react";
-
-interface Message {
-  id: number;
-  sender: "user" | "bot";
-  text: string;
-}
+import { useState } from "react";
 
 export default function ChatUI() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [chat, setChat] = useState<
+    { sender: string; text: string }[]
+  >([]);
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const sendMessage = async () => {
+    if (!message.trim()) return;
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Add user message
+    setChat((prev) => [...prev, { sender: "user", text: message }]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message }),
+    });
 
-    const userMessage: Message = {
-      id: Date.now(),
-      sender: "user",
-      text: input,
-    };
+    const data = await res.json();
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setLoading(true);
+    // Add bot reply
+    setChat((prev) => [
+      ...prev,
+      { sender: "bot", text: data.reply },
+    ]);
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage.text }),
-      });
-
-      const data = await res.json();
-
-      const botMessage: Message = {
-        id: Date.now() + 1,
-        sender: "bot",
-        text: data.response,
-      };
-
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (err) {
-      console.error("Error fetching bot response:", err);
-    } finally {
-      setLoading(false);
-    }
+    setMessage("");
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[80vh] w-full bg-gray-100 rounded-lg shadow-lg p-4">
-      <div className="flex-1 overflow-y-auto mb-4">
-        {messages.map((msg) => (
+    <div className="p-4 max-w-md mx-auto">
+      <div className="border p-4 h-96 overflow-y-auto mb-4 bg-gray-100 rounded">
+        {chat.map((msg, index) => (
           <div
-            key={msg.id}
-            className={`mb-2 p-2 rounded ${
-              msg.sender === "user" ? "bg-blue-500 text-white self-end" : "bg-gray-300 text-black self-start"
+            key={index}
+            className={`mb-2 ${
+              msg.sender === "user"
+                ? "text-right"
+                : "text-left"
             }`}
           >
-            {msg.text}
+            <span
+              className={`inline-block px-3 py-2 rounded ${
+                msg.sender === "user"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300"
+              }`}
+            >
+              {msg.text}
+            </span>
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <div className="flex">
         <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="border flex-1 p-2 rounded-l"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type your message..."
         />
         <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-          disabled={loading}
+          onClick={sendMessage}
+          className="bg-blue-500 text-white px-4 rounded-r"
         >
-          {loading ? "..." : "Send"}
+          Send
         </button>
-      </form>
+      </div>
     </div>
   );
 }

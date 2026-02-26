@@ -27,7 +27,7 @@ const negativeKeywords = [
   "sad",
 ];
 
-export function analyzeSentiment(message: string): Sentiment {
+export function detectSentiment(message: string): Sentiment {
   const text = message.toLowerCase();
 
   for (const word of positiveKeywords) {
