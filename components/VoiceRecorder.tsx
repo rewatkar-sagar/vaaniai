@@ -6,6 +6,20 @@ interface VoiceRecorderProps {
   onTranscribe: (text: string) => void;
 }
 
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+  }
+  interface SpeechRecognition {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    onresult: (event: any) => void;
+    start: () => void;
+    stop: () => void;
+  }
+}
+
 export default function VoiceRecorder({ onTranscribe }: VoiceRecorderProps) {
   const [recording, setRecording] = useState(false);
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
@@ -16,7 +30,7 @@ export default function VoiceRecorder({ onTranscribe }: VoiceRecorderProps) {
       return;
     }
 
-    const recog = new webkitSpeechRecognition() as SpeechRecognition;
+    const recog = new (window as any).webkitSpeechRecognition() as SpeechRecognition;
     recog.continuous = false;
     recog.interimResults = false;
     recog.lang = "en-US";
