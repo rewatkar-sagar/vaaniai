@@ -9,7 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.97.0",
+    "@types/langdetect": "^0.2.2",
+    "langdetect": "^0.2.1",
     "next": "16.1.6",
     "openai": "^6.25.0",
     "react": "19.2.3",
