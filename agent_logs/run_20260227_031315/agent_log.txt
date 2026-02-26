@@ -1,0 +1,18 @@
+Step 1 | Action: click | Reason: The current screen shows a terminal window titled 'Vaani_Al.bat' which is likely intended for executing a batch file. The next logical step is to click inside the terminal window to focus it, allowing for input or execution of commands.
+--------------------------------------------------
+Step 2 | Action: click | Reason: The terminal window titled 'Vaani_Al.bat' was previously clicked, and the current screen shows a new PowerShell window. The next logical step is to click inside the PowerShell window to focus it for command input.
+--------------------------------------------------
+Step 3 | Action: type_text | Reason: The user needs to navigate to the Downloads folder to access files, likely for the task related to Kaju.
+--------------------------------------------------
+Step 4 | Action: click | Reason: The PowerShell window is currently focused and ready for command input. The next logical step is to click inside the terminal to ensure it remains active for further commands related to the task from Kaju.
+--------------------------------------------------
+Step 5 | Action: type_text | Reason: The user is in the Downloads folder and needs to list the contents to identify files related to Kaju.
+--------------------------------------------------
+Step 6 | Action: press_key | Reason: The user has typed 'dir' in the PowerShell window to list the contents of the Downloads folder. Pressing 'enter' will execute the command and display the directory contents, which is the next logical step to identify files related to Kaju.
+--------------------------------------------------
+Step 7 | Action: type_text | Reason: The user needs to list the contents of the current directory to identify files related to Kaju. Since the previous attempt to navigate to the Downloads folder failed, listing the current directory is the next logical step to find relevant files.
+--------------------------------------------------
+Step 8 | Action: click | Reason: The PowerShell window has been closed, and the desktop is now visible. The next logical step is to interact with the desktop icons to locate files related to Kaju. The "vaanai" folder on the desktop is likely to contain the required files, so clicking on it is the appropriate next action.
+--------------------------------------------------
+Step 9 | Action: click | Reason: The user has clicked on the "vaanai" folder icon on the desktop, which is visible in the current screen state. This action aligns with the task of accessing files related to Kaju, as the folder likely contains the necessary files.
+--------------------------------------------------

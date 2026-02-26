@@ -1,0 +1,6 @@
+Step 1 | Action: click | Reason: The current screen shows YouTube's homepage with Shorts and recommended videos. To scroll reels for 10, the next logical step is to click on a video thumbnail or area that allows scrolling or viewing more content. The center of the screen, around the middle of the Shorts section, is a likely target for initiating a scroll or interaction.
+--------------------------------------------------
+Step 2 | Action: press_key | Reason: The current screen shows a Shorts video playing, and to scroll reels for 10, the next logical step is to use the spacebar to play/pause or navigate through the video, which will allow scrolling through more content.
+--------------------------------------------------
+Step 3 | Action: press_key | Reason: The current screen shows a Shorts video playing, and to continue scrolling through reels for 10, the next logical step is to use the spacebar to play/pause or navigate through the video, which will allow scrolling through more content.
+--------------------------------------------------

@@ -19,7 +19,7 @@ from tkinter import scrolledtext
 import win32gui
 import win32con
 import speech_recognition as sr
-import pyttsx3 # NEW: Text-to-Speech library
+import pyttsx3 
 
 # Force physical pixel mapping
 try:
@@ -53,11 +53,10 @@ class AgentGUI:
         self.canvas.place(x=1, y=1, width=self.w-2, height=self.h-2)
         
         self.is_running = False
-        self.mic_state = "WAKE_WORD" # States: WAKE_WORD, TASK, RUNNING
+        self.mic_state = "WAKE_WORD" 
         
-        # Initialize Text-to-Speech Engine
         self.engine = pyttsx3.init()
-        self.engine.setProperty('rate', 170) # Set speaking speed
+        self.engine.setProperty('rate', 170) 
         
         with mss.mss() as sct:
             monitor = sct.monitors[1]
@@ -69,9 +68,26 @@ class AgentGUI:
         self.setup_vision_border()
         self.setup_ui()
         
-        # Start the always-on background wake word listener
-        threading.Thread(target=self.wake_word_loop, daemon=True).start()
+        # UPGRADE: Bind the "Wake Up" event to restore borderless mode
+        self.win.bind("<Map>", self.on_window_map)
         
+        # Force Windows to keep the borderless app in the Taskbar!
+        self.win.after(10, self.set_appwindow)
+        
+        threading.Thread(target=self.wake_word_loop, daemon=True).start()
+
+    def set_appwindow(self):
+        """Uses Windows C-API to force the borderless window into the Taskbar natively."""
+        hwnd = ctypes.windll.user32.GetParent(self.win.winfo_id())
+        GWL_EXSTYLE = -20
+        WS_EX_APPWINDOW = 0x00040000
+        WS_EX_TOOLWINDOW = 0x00000080
+        
+        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+        style = style & ~WS_EX_TOOLWINDOW
+        style = style | WS_EX_APPWINDOW
+        ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+
     def setup_vision_border(self):
         self.border_win = tk.Toplevel(self.win)
         self.border_win.title("AIVisionBorder")
@@ -96,49 +112,110 @@ class AgentGUI:
 
     def setup_ui(self):
         fonts = {"title": ("Segoe UI", 11, "bold"), "body": ("Segoe UI", 10), "log": ("Consolas", 9)}
-        colors = {"bg": self.bg_color, "surface": "#252525", "primary": "#BB86FC", "accent": "#03DAC6", "text": "#E0E0E0", "error": "#CF6679"}
+        self.colors = {"bg": self.bg_color, "surface": "#252525", "primary": "#BB86FC", "accent": "#03DAC6", "text": "#E0E0E0", "error": "#CF6679"}
 
-        self.title_frame = tk.Frame(self.canvas, bg=colors["surface"])
+        self.title_frame = tk.Frame(self.canvas, bg=self.colors["surface"])
         self.title_frame.place(x=0, y=0, width=self.w-2, height=35)
         
-        tk.Label(self.title_frame, text="✨ Vaani AI Command Center", fg=colors["text"], bg=colors["surface"], font=fonts["title"]).pack(side=tk.LEFT, padx=15)
+        tk.Label(self.title_frame, text="✨ Vaani AI Command Center", fg=self.colors["text"], bg=self.colors["surface"], font=fonts["title"]).pack(side=tk.LEFT, padx=15)
+        
+        ctrl_frame = tk.Frame(self.title_frame, bg=self.colors["surface"])
+        ctrl_frame.pack(side=tk.RIGHT, padx=5)
+        
+        self.min_btn = tk.Button(ctrl_frame, text="—", bg=self.colors["surface"], fg=self.colors["text"], bd=0, font=("Segoe UI", 10, "bold"), cursor="hand2", command=self.minimize_app)
+        self.min_btn.pack(side=tk.LEFT, padx=5)
+        
+        self.close_btn = tk.Button(ctrl_frame, text="X", bg=self.colors["surface"], fg=self.colors["error"], bd=0, font=("Segoe UI", 10, "bold"), cursor="hand2", command=self.close_app)
+        self.close_btn.pack(side=tk.LEFT, padx=5)
+        
+        self.close_btn.bind("<Enter>", lambda e: self.close_btn.config(bg="#FF4C4C", fg="white"))
+        self.close_btn.bind("<Leave>", lambda e: self.close_btn.config(bg=self.colors["surface"], fg=self.colors["error"]))
+        self.min_btn.bind("<Enter>", lambda e: self.min_btn.config(bg="#444444"))
+        self.min_btn.bind("<Leave>", lambda e: self.min_btn.config(bg=self.colors["surface"]))
         
         self.title_frame.bind("<ButtonPress-1>", self.start_move)
         self.title_frame.bind("<ButtonRelease-1>", self.stop_move)
         self.title_frame.bind("<B1-Motion>", self.do_move)
 
-        self.content = tk.Frame(self.canvas, bg=colors["bg"])
+        self.content = tk.Frame(self.canvas, bg=self.colors["bg"])
         self.content.place(x=15, y=45, width=self.w-32, height=self.h-60)
 
-        tk.Label(self.content, text="Task Description:", fg=colors["primary"], bg=colors["bg"], font=fonts["title"]).pack(anchor="w", pady=(5,2))
-        self.task_entry = tk.Entry(self.content, bg=colors["surface"], fg=colors["text"], font=fonts["body"], insertbackground=colors["text"], relief=tk.FLAT)
+        tk.Label(self.content, text="Task Description:", fg=self.colors["primary"], bg=self.colors["bg"], font=fonts["title"]).pack(anchor="w", pady=(5,2))
+        self.task_entry = tk.Entry(self.content, bg=self.colors["surface"], fg=self.colors["text"], font=fonts["body"], insertbackground=self.colors["text"], relief=tk.FLAT)
         self.task_entry.pack(fill=tk.X, pady=(0, 15), ipady=6)
         
-        self.btn_frame = tk.Frame(self.content, bg=colors["bg"])
+        self.btn_frame = tk.Frame(self.content, bg=self.colors["bg"])
         self.btn_frame.pack(fill=tk.X, pady=(0, 15))
         
-        self.voice_btn = tk.Button(self.btn_frame, text="🎤 VOICE START", bg=colors["primary"], fg="#FFFFFF", font=fonts["title"], relief=tk.FLAT, cursor="hand2", command=self.start_voice_agent)
+        self.voice_btn = tk.Button(self.btn_frame, text="🎤 VOICE START", bg=self.colors["primary"], fg="#FFFFFF", font=fonts["title"], relief=tk.FLAT, cursor="hand2", command=self.start_voice_agent)
         self.voice_btn.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0, 5), ipady=4)
 
-        self.start_btn = tk.Button(self.btn_frame, text="▶ TEXT START", bg=colors["accent"], fg="#000000", font=fonts["title"], relief=tk.FLAT, cursor="hand2", command=self.start_agent)
+        self.start_btn = tk.Button(self.btn_frame, text="▶ TEXT START", bg=self.colors["accent"], fg="#000000", font=fonts["title"], relief=tk.FLAT, cursor="hand2", command=self.start_agent)
         self.start_btn.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0, 5), ipady=4)
         
-        self.stop_btn = tk.Button(self.btn_frame, text="⏹ STOP", bg=colors["error"], fg="#FFFFFF", font=fonts["title"], relief=tk.FLAT, cursor="hand2", state=tk.DISABLED, command=self.stop_agent)
+        self.stop_btn = tk.Button(self.btn_frame, text="⏹ STOP", bg=self.colors["error"], fg="#FFFFFF", font=fonts["title"], relief=tk.FLAT, cursor="hand2", state=tk.DISABLED, command=self.stop_agent)
         self.stop_btn.pack(side=tk.RIGHT, expand=True, fill=tk.X, padx=(5, 0), ipady=4)
 
-        self.status_frame = tk.Frame(self.content, bg=colors["bg"])
+        self.status_frame = tk.Frame(self.content, bg=self.colors["bg"])
         self.status_frame.pack(fill=tk.X, pady=(0, 5))
         
-        self.step_lbl = tk.Label(self.status_frame, text="Step: 0", fg=colors["accent"], bg=colors["bg"], font=fonts["title"])
+        self.step_lbl = tk.Label(self.status_frame, text="Step: 0", fg=self.colors["accent"], bg=self.colors["bg"], font=fonts["title"])
         self.step_lbl.pack(side=tk.LEFT)
         
-        self.action_lbl = tk.Label(self.status_frame, text="Say 'Start Voice Command'", fg="#FFB74D", bg=colors["bg"], font=fonts["body"])
+        self.action_lbl = tk.Label(self.status_frame, text="Say 'Start Voice Command'", fg="#FFB74D", bg=self.colors["bg"], font=fonts["body"])
         self.action_lbl.pack(side=tk.RIGHT)
 
-        tk.Label(self.content, text="Execution Logs:", fg=colors["primary"], bg=colors["bg"], font=fonts["title"]).pack(anchor="w")
+        tk.Label(self.content, text="Execution Logs:", fg=self.colors["primary"], bg=self.colors["bg"], font=fonts["title"]).pack(anchor="w")
         
         self.log_area = scrolledtext.ScrolledText(self.content, bg="#121212", fg="#A9B7C6", font=fonts["log"], relief=tk.FLAT, wrap=tk.WORD, state=tk.DISABLED, bd=0)
         self.log_area.pack(fill=tk.BOTH, expand=True, pady=(5, 5))
+        
+        self.resize_grip = tk.Label(self.canvas, text="◢", bg=self.colors["bg"], fg="#555555", font=("Segoe UI", 12), cursor="size_nw_se")
+        self.resize_grip.place(x=self.w-22, y=self.h-26)
+        
+        self.resize_grip.bind("<ButtonPress-1>", self.start_resize)
+        self.resize_grip.bind("<B1-Motion>", self.do_resize)
+
+    # --- THE MINIMIZE FIX ---
+    def minimize_app(self):
+        # 1. Temporarily give the window back to Windows OS
+        self.win.overrideredirect(False) 
+        # 2. Now we can legally minimize it to the taskbar
+        self.win.iconify()
+
+    def on_window_map(self, event):
+        # 3. When the user clicks the taskbar icon to wake it up,
+        # we instantly rip the Windows border back off!
+        if event.widget == self.win:
+            self.win.overrideredirect(True)
+            self.set_appwindow()
+
+    def close_app(self):
+        self.is_running = False
+        self.mic_state = "STOPPED"
+        try:
+            self.engine.stop()
+        except:
+            pass
+        self.win.destroy()
+        os._exit(0) 
+
+    def start_resize(self, event):
+        self.start_x = event.x_root
+        self.start_y = event.y_root
+        self.start_w = self.w
+        self.start_h = self.h
+
+    def do_resize(self, event):
+        dx = event.x_root - self.start_x
+        dy = event.y_root - self.start_y
+        self.w = max(450, self.start_w + dx)
+        self.h = max(350, self.start_h + dy)
+        self.win.geometry(f"{self.w}x{self.h}")
+        self.canvas.place(x=1, y=1, width=self.w-2, height=self.h-2)
+        self.title_frame.place(x=0, y=0, width=self.w-2, height=35)
+        self.content.place(x=15, y=45, width=self.w-32, height=self.h-60)
+        self.resize_grip.place(x=self.w-22, y=self.h-26)
 
     def start_move(self, event):
         self.x = event.x
@@ -172,11 +249,9 @@ class AgentGUI:
         self.action_lbl.config(text=text)
 
     def speak(self, text):
-        """Helper to make the agent talk out loud"""
         self.engine.say(text)
         self.engine.runAndWait()
 
-    # --- WAKE WORD LOOP (MODE 1) ---
     def wake_word_loop(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
@@ -184,7 +259,6 @@ class AgentGUI:
             self.log("🎧 Wake Word Monitor Active. Say 'Start Voice Command'.")
             
             while True:
-                # Only listen for wake word if agent is idle
                 if self.mic_state != "WAKE_WORD":
                     time.sleep(0.5)
                     continue
@@ -195,18 +269,17 @@ class AgentGUI:
                     
                     if "start voice command" in text or "start voice" in text:
                         self.log("\n🎙️ Wake word detected!")
-                        self.mic_state = "TASK" # Claim the mic
+                        self.mic_state = "TASK" 
                         self.speak("I am listening.")
                         self.win.after(0, self.start_voice_agent)
                 except:
                     continue
 
-    # --- TASK LISTENER (MODE 2) ---
     def start_voice_agent(self):
         if self.is_running: return
-        self.mic_state = "TASK" # Ensure wake word loop is paused
+        self.mic_state = "TASK" 
         
-        self.log("🎙️ Recording your task prompt...")
+        self.log("🎙️ Recording your task prompt... (Speak for up to 60 seconds)")
         self.update_status(0, "Listening for task...")
         self.start_btn.config(state=tk.DISABLED)
         self.voice_btn.config(state=tk.DISABLED)
@@ -217,7 +290,7 @@ class AgentGUI:
             try:
                 with sr.Microphone() as source:
                     r.adjust_for_ambient_noise(source, duration=0.2)
-                    audio = r.listen(source, timeout=5, phrase_time_limit=15)
+                    audio = r.listen(source, timeout=15, phrase_time_limit=60)
                 text = r.recognize_google(audio)
                 self.win.after(0, self._set_task_and_start, text)
             except Exception as e:
@@ -233,7 +306,6 @@ class AgentGUI:
         self.log(f"🗣️ Heard Task: '{text}'")
         self.start_agent()
 
-    # --- STOP MONITOR (MODE 3) ---
     def listen_for_stop_command(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
@@ -251,7 +323,6 @@ class AgentGUI:
                 except:
                     continue
 
-    # --- CORE CONTROLS ---
     def start_agent(self):
         task = self.task_entry.get()
         if not task.strip():
@@ -260,7 +331,7 @@ class AgentGUI:
             return
             
         self.is_running = True
-        self.mic_state = "RUNNING" # Activate Stop Monitor
+        self.mic_state = "RUNNING" 
         
         self.start_btn.config(state=tk.DISABLED, bg="#555555")
         self.voice_btn.config(state=tk.DISABLED, bg="#555555")
@@ -274,7 +345,6 @@ class AgentGUI:
         self.log("🚀 Initializing Autonomous Vision Agent...")
         self.log(f"📋 Task: {task}\n" + "="*40)
         
-        # Start AI Loop & Stop Monitor
         threading.Thread(target=self.run_agent_loop, args=(task,), daemon=True).start()
         threading.Thread(target=self.listen_for_stop_command, daemon=True).start()
 
@@ -284,13 +354,11 @@ class AgentGUI:
         self._reset_buttons()
         
     def _reset_buttons(self):
-        self.start_btn.config(state=tk.NORMAL, bg="#03DAC6")
-        self.voice_btn.config(state=tk.NORMAL, bg="#BB86FC")
+        self.start_btn.config(state=tk.NORMAL, bg=self.colors["accent"])
+        self.voice_btn.config(state=tk.NORMAL, bg=self.colors["primary"])
         self.stop_btn.config(state=tk.DISABLED)
         self.task_entry.config(state=tk.NORMAL)
         self.update_status(0, "Say 'Start Voice Command'")
-        
-        # Reset mic back to Wake Word mode
         self.mic_state = "WAKE_WORD" 
 
     def hide_window(self):

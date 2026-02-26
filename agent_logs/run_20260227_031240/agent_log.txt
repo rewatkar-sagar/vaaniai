@@ -1,0 +1,4 @@
+Step 1 | Action: type_text | Reason: The task requires typing the exact phrase 'abe hay bolate.' into the active terminal window, which is currently open and ready for input.
+--------------------------------------------------
+Step 2 | Action: wait | Reason: The terminal window is active and ready for input. The previous action of typing the phrase has been completed, so a brief wait ensures the system processes the input and prepares for the next step.
+--------------------------------------------------
