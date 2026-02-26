@@ -1,0 +1,4 @@
+Step 1 | Action: press_key | Reason: The current screen shows a Python development environment, and WhatsApp is not visible. To open WhatsApp, I need to access the search menu by pressing the Windows key.
+--------------------------------------------------
+Step 2 | Action: click | Reason: The WhatsApp icon is visible in the 'Recommended' section of the search menu, and clicking it will open WhatsApp as intended.
+--------------------------------------------------
