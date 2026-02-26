@@ -1,17 +1,32 @@
-import ChatUI from "@/components/ChatUI";
+"use client";
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+// Load ChatUI only on the client side to prevent "Hydration Mismatch" errors
+const ChatUI = dynamic(() => import("@/components/ChatUI"), { 
+  ssr: false,
+  loading: () => <div className="text-cyan-400 animate-pulse">Initializing Vaani AI...</div>
+});
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-      <div className="bg-white shadow-2xl rounded-2xl p-6 w-full max-w-lg">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
-          🎙 VaaniAI
+    <main className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-4">
+      <div className="text-center mb-6 animate-in fade-in duration-1000">
+        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">
+          Project <span className="text-cyan-400">Vaani</span>
         </h1>
-        <p className="text-center text-gray-500 mb-4">
-          Emotion-Aware Multilingual Voice Assistant
+        <p className="text-slate-500 text-sm mt-2 tracking-widest uppercase">
+          Multilingual Emotion-Aware Assistant
         </p>
-        <ChatUI />
       </div>
-    </div>
+      
+      {mounted && <ChatUI />}
+    </main>
   );
 }
