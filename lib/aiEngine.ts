@@ -62,4 +62,16 @@ export async function generateAIResponse(
   const closing = " " + getRandomItem(supportiveClosings);
 
   return base + urgencyLine + closing;
+  if (message.toLowerCase().includes("write email")) {
+  return `Sure. Here is your email draft:
+
+Subject: Regarding Your Concern
+
+Dear Sir/Madam,
+
+I hope this message finds you well. I am writing to address the issue mentioned earlier. Kindly look into this matter at the earliest.
+
+Thank you,
+[Your Name]`;
+}
 }

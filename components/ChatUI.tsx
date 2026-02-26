@@ -4,51 +4,72 @@ import { useState } from "react";
 
 export default function ChatUI() {
   const [message, setMessage] = useState("");
-  const [chat, setChat] = useState<
-    { sender: string; text: string }[]
-  >([]);
+  const [chat, setChat] = useState<any[]>([]);
 
-  const sendMessage = async () => {
-    if (!message.trim()) return;
+  const speak = (text: string, lang: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    window.speechSynthesis.speak(utterance);
+  };
 
-    // Add user message
-    setChat((prev) => [...prev, { sender: "user", text: message }]);
+  const detectLanguage = (text: string) => {
+    if (/[\u0900-\u097F]/.test(text)) {
+      return "hi-IN";
+    }
+    return "en-IN";
+  };
+
+  const sendMessage = async (input?: string) => {
+    const finalMessage = input || message;
+    if (!finalMessage.trim()) return;
+
+    setChat((prev) => [...prev, { sender: "user", text: finalMessage }]);
 
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: finalMessage }),
     });
 
     const data = await res.json();
 
-    // Add bot reply
     setChat((prev) => [
       ...prev,
       { sender: "bot", text: data.reply },
     ]);
 
+    speak(data.reply, detectLanguage(finalMessage));
     setMessage("");
   };
 
+  const startVoice = () => {
+    const SpeechRecognition =
+      (window as any).speechRecognition || (window as any).webkitSpeechRecognition;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.start();
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      sendMessage(transcript);
+    };
+  };
+
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <div className="border p-4 h-96 overflow-y-auto mb-4 bg-gray-100 rounded">
+    <>
+      <div className="h-80 overflow-y-auto bg-gray-100 p-4 rounded-lg mb-4">
         {chat.map((msg, index) => (
           <div
             key={index}
             className={`mb-2 ${
-              msg.sender === "user"
-                ? "text-right"
-                : "text-left"
+              msg.sender === "user" ? "text-right" : "text-left"
             }`}
           >
             <span
-              className={`inline-block px-3 py-2 rounded ${
+              className={`inline-block px-4 py-2 rounded-xl ${
                 msg.sender === "user"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-indigo-500 text-white"
                   : "bg-gray-300"
               }`}
             >
@@ -58,20 +79,26 @@ export default function ChatUI() {
         ))}
       </div>
 
-      <div className="flex">
+      <div className="flex gap-2">
         <input
-          className="border flex-1 p-2 rounded-l"
+          className="flex-1 border p-2 rounded-xl"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
+          placeholder="Type or use voice..."
         />
         <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 rounded-r"
+          onClick={() => sendMessage()}
+          className="bg-indigo-500 text-white px-4 rounded-xl"
         >
           Send
         </button>
+        <button
+          onClick={startVoice}
+          className="bg-green-500 text-white px-4 rounded-xl"
+        >
+          🎤
+        </button>
       </div>
-    </div>
+    </>
   );
 }
