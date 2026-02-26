@@ -1,19 +1,15 @@
-// lib/urgencyDetector.ts
+export function detectUrgency(message: string) {
+  const lower = message.toLowerCase();
 
-const urgentKeywords = [
-  "urgent",
-  "immediately",
-  "asap",
-  "right now",
-  "emergency",
-  "important",
-  "critical",
-  "now",
-  "fast",
-];
+  const urgentWords = [
+    "fraud",
+    "blocked",
+    "emergency",
+    "immediately",
+    "urgent",
+  ];
 
-export function detectUrgency(message: string): boolean {
-  const text = message.toLowerCase();
-
-  return urgentKeywords.some((word) => text.includes(word));
+  return urgentWords.some(word =>
+    lower.includes(word)
+  );
 }
