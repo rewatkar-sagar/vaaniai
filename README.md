@@ -1,5 +1,5 @@
 # 🎤 **Vaani AI** - *Multilingual Voice Assistant*
-## **Nagpur Hackathon 2026 Winner** | [Live Demo](https://vaaaniai-five.vercel.app/)
+## **Nagpur Hackathon 2026 ** | [Live Demo](https://vaaaniai-five.vercel.app/)
 
 ***
 
@@ -241,6 +241,60 @@ Copyright © 2026 Vaani AI Team
 **QR Code:** [Scan for instant demo →](#)  
 **Built with ❤️ for Nagpur Hackathon 2026** 🇮🇳
 
+
+**Vaani AI Command Center**
+
+Vaani AI is a fully offline, voice-activated Vision-Language Model (VLM) desktop agent that automates multi-step tasks by visually understanding your screen. Built as a local alternative to cloud-based RPA tools, it supports zero-shot visual reasoning and natural language commands.
+
+Key Features
+
+100% Offline & Private: Runs locally with no data sent to the cloud.
+
+Voice & Text Control: Wake with “Start Voice Command” or type tasks directly. Say “Stop” anytime to halt actions.
+
+Self-Correcting Visual Memory: Detects missed clicks and dynamically adjusts coordinates.
+
+Dynamic Error Handling: Guards against infinite loops, UI latency, and Windows thread issues.
+
+Sleek Custom UI: Dark-themed, borderless interface with smooth Windows API integration.
+
+Technology Stack
+
+Language: Python 3.10+
+
+Vision & Automation: mss, OpenCV, Pillow, pyautogui
+
+Voice Engine: SpeechRecognition, pyttsx3, comtypes
+
+UI & OS Integration: Tkinter, ctypes, win32gui
+
+AI Backend: Local LM Studio server (e.g., Qwen3-VL-4B)
+
+Setup
+
+Install Python 3.10+, LM Studio, and a Vision Model.
+
+Clone repo, create a virtual environment, and install dependencies.
+
+Start LM Studio server (http://localhost:1234/v1/chat/completions).
+
+Run python Agent.py and interact via voice or text.
+
+How It Works
+
+Takes screenshots, compresses to 1024×1024, and decides actions via JSON: click, type, key press, wait, done.
+
+Logs reasoning in real-time for transparency.
+
+Future Scope
+
+Multi-monitor spatial awareness
+
+Local RAG integration for documents
+
+Long-term memory for extended workflows
+
+Developed for the SITNovate 2.0 Hackathon
 ***
 
 ## **📥 Save as `README.md` → Push to GitHub → HACKATHON READY!** 🏆✨
