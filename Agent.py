@@ -163,7 +163,7 @@ class AgentGUI:
         self.step_lbl = tk.Label(self.status_frame, text="Step: 0", fg=self.colors["accent"], bg=self.colors["bg"], font=fonts["title"])
         self.step_lbl.pack(side=tk.LEFT)
         
-        self.action_lbl = tk.Label(self.status_frame, text="Say 'Start Voice Command'", fg="#FFB74D", bg=self.colors["bg"], font=fonts["body"])
+        self.action_lbl = tk.Label(self.status_frame, text="Say 'Start Voice'", fg="#FFB74D", bg=self.colors["bg"], font=fonts["body"])
         self.action_lbl.pack(side=tk.RIGHT)
 
         tk.Label(self.content, text="Execution Logs:", fg=self.colors["primary"], bg=self.colors["bg"], font=fonts["title"]).pack(anchor="w")
@@ -273,7 +273,7 @@ class AgentGUI:
         r = sr.Recognizer()
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source, duration=0.5)
-            self.log("🎧 Wake Word Monitor Active. Say 'Start Voice Command'.")
+            self.log("🎧 Wake Word Monitor Active. Say 'Start Voice'.")
             
             while True:
                 if self.mic_state != "WAKE_WORD":
@@ -375,7 +375,7 @@ class AgentGUI:
         self.voice_btn.config(state=tk.NORMAL, bg=self.colors["primary"])
         self.stop_btn.config(state=tk.DISABLED)
         self.task_entry.config(state=tk.NORMAL)
-        self.update_status(0, "Say 'Start Voice Command'")
+        self.update_status(0, "Say 'Start Voice'")
         self.mic_state = "WAKE_WORD" 
 
     def hide_window(self):
