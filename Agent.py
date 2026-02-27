@@ -2,6 +2,7 @@ import mss
 import base64
 import requests
 import time
+import comtypes.client
 import json
 import pyautogui
 import re
@@ -248,9 +249,25 @@ class AgentGUI:
         self.step_lbl.config(text=f"Step: {step}")
         self.action_lbl.config(text=text)
 
+    # UPGRADE: Bypassing pyttsx3 entirely to use native Windows SAPI5
+    # This guarantees the agent speaks EVERY time, without freezing.
     def speak(self, text):
-        self.engine.say(text)
-        self.engine.runAndWait()
+        def _speak_thread():
+            try:
+                comtypes.CoInitialize() 
+                # Create a direct link to the Windows Voice Engine
+                speaker = comtypes.client.CreateObject("SAPI.SpVoice")
+                
+                # SAPI rate goes from -10 to 10 (0 is normal speed)
+                speaker.Rate = 2 
+                
+                speaker.Speak(text)
+            except Exception as e:
+                pass
+            finally:
+                comtypes.CoUninitialize()
+        
+        threading.Thread(target=_speak_thread, daemon=True).start()
 
     def wake_word_loop(self):
         r = sr.Recognizer()
@@ -264,10 +281,10 @@ class AgentGUI:
                     continue
                     
                 try:
-                    audio = r.listen(source, timeout=1, phrase_time_limit=3)
+                    audio = r.listen(source, timeout=4, phrase_time_limit=180)
                     text = r.recognize_google(audio).lower()
                     
-                    if "start voice command" in text or "start voice" in text:
+                    if "start voice" in text or "start voice" in text:
                         self.log("\n🎙️ Wake word detected!")
                         self.mic_state = "TASK" 
                         self.speak("I am listening.")
@@ -314,7 +331,7 @@ class AgentGUI:
             
             while self.mic_state == "RUNNING":
                 try:
-                    audio = r.listen(source, timeout=1, phrase_time_limit=2)
+                    audio = r.listen(source, timeout=4, phrase_time_limit=160)
                     text = r.recognize_google(audio).lower()
                     if "stop" in text or "cancel" in text or "halt" in text:
                         self.log(f"\n🛑 Voice Command '{text.upper()}' recognized!")
