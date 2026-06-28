@@ -112,8 +112,8 @@ npm run start
 | **Role** | **Member** | **Contribution** |
 |----------|------------|------------------|
 | 🎨 **Full Stack Developer** | Sagar Rewatkar | Next.js 16, TypeScript, Voice AI, UI/UX, Vercel Deploy |
-| 🧠 **Voice AI Specialist** | Sagar Rewatkar | Web Speech API, Hindi/Marathi integration |
-| 🚀 **DevOps** | Sagar Rewatkar | GitHub Actions, Vercel CI/CD, Production optimization |
+| 🧠 **Voice AI Specialist** | Toshit & Anup | Web Speech API, Hindi/Marathi integration |
+| 🚀 **DevOps** | Toshit & Anup | GitHub Actions, Vercel CI/CD, Production optimization |
 
 **Solo Developer** | **Nagpur, Maharashtra** 🇮🇳
 
