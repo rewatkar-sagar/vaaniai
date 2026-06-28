@@ -115,7 +115,7 @@ npm run start
 | 🧠 **Voice AI Specialist** | Toshit & Anup | Web Speech API, Hindi/Marathi integration |
 | 🚀 **DevOps** | Toshit & Anup | GitHub Actions, Vercel CI/CD, Production optimization |
 
-**Solo Developer** | **Nagpur, Maharashtra** 🇮🇳
+**Developed by:**Sagar Rewatkar,Toshit & Anup | **Nagpur, Maharashtra** 🇮🇳
 
 ***
 
